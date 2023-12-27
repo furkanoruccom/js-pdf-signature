@@ -21,7 +21,6 @@
 
         .selectionArea {
             position: absolute;
-            top: 0;
             width: 100px;
             height: 100px;
             border: 2px dashed blue;
@@ -37,44 +36,11 @@
             border-radius: 5px;
             font-size: 20px;
         }
-
-
-        .signatureWrapper {
-            cursor: move;
-            border: 1px solid red;
-            /* Görsellik için */
-        }
-
-        .signature {
-            width: 100%;
-            height: 100%;
-        }
-
-        .resize-handle {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 10px;
-            height: 10px;
-            background: red;
-            cursor: nwse-resize;
-        }
-
-        .rotate-handle {
-            position: absolute;
-            top: 0px;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            background: blue;
-            cursor: pointer;
-        }
     </style>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/flick/jquery-ui.css">
 </head>
 
 <body>
-    <div id="pdfCanvasContainer" style="width: 476px; height: 673px; position: relative;">
+    <div id="pdfCanvasContainer" style="width: 476px; position: relative;">
 
         <canvas id="pdfCanvas"></canvas>
 
@@ -87,12 +53,6 @@
 
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-    <script src="https://www.jqueryscript.net/demo/CSS3-Rotatable-jQuery-UI/jquery.ui.rotatable.js"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
     <script src="jspdf.min.js"></script>
     <script src="html2canvas.min.js"></script>
@@ -100,13 +60,9 @@
 
 
 
-
     <script>
         var pdfCanvas = document.getElementById('pdfCanvas');
         var selectionArea = document.getElementById('selectionArea');
-        // selectionArea.draggable({
-        //     containment: "#pdfCanvasContainer"
-        // });
         var canvasContext = pdfCanvas.getContext('2d');
         var dragging = false;
         var offset = { x: 0, y: 0 };
@@ -172,74 +128,14 @@
         window.addEventListener('mouseup', stopDrag, false);
         window.addEventListener('touchend', stopDrag, false);
 
-        // İmza elementini yaratan fonksiyon
-        function createSignatureElement(src, x, y) {
-            var wrapper = document.createElement('div');
-            wrapper.classList.add('signatureWrapper');
-
-            // İmzanın başlangıç konumunu ayarlayın
-            wrapper.style.left = x + 'px';
-            wrapper.style.top = y + 'px';
-            wrapper.style.position = 'absolute';
-
-            var img = new Image();
-            img.src = src;
-            img.classList.add('signature');
-
-            var resizeHandle = document.createElement('div');
-            resizeHandle.classList.add('resize-handle');
-
-            var rotateHandle = document.createElement('div');
-            rotateHandle.classList.add('rotate-handle');
-
-            wrapper.appendChild(img);
-            wrapper.appendChild(resizeHandle);
-            wrapper.appendChild(rotateHandle);
-
-            return wrapper;
-        }
-
-
-
-        // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
             var x = parseInt(selectionArea.style.left, 10);
             var y = parseInt(selectionArea.style.top, 10);
-            var signatureElement = createSignatureElement(getRandomSignature(), x, y)
-
-
-            console.log(x + " " + y);
-            pdfCanvas.parentElement.appendChild(signatureElement);
-
-            $(".signatureWrapper").css({ "height": "100px", "width": "100px" }).resizable({
-                aspectRatio: true, // Orantılı yeniden boyutlandırmayı etkinleştirir
-                start: function (event, ui) {
-                    // Yeniden boyutlandırma başladığında orijinal boyutları kaydet
-                    var startWidth = ui.size.width;
-                    var startHeight = ui.size.height;
-
-                    $(this).data('startWidth', startWidth);
-                    $(this).data('startHeight', startHeight);
-                },
-                resize: function (event, ui) {
-                    // Yeniden boyutlandırma sırasında orantıyı koru
-                    var startWidth = $(this).data('startWidth');
-                    var startHeight = $(this).data('startHeight');
-                    var newWidth = ui.size.width;
-                    var newHeight = ui.size.height;
-
-                    if (newWidth != startWidth) {
-                        newHeight = Math.round((startHeight / startWidth) * newWidth);
-                        ui.size.height = newHeight;
-                    } else if (newHeight != startHeight) {
-                        newWidth = Math.round((startWidth / startHeight) * newHeight);
-                        ui.size.width = newWidth;
-                    }
-                }
-            }).rotatable().draggable({
-                containment: "#pdfCanvasContainer"
-            });
-
+            var signatureImage = new Image();
+            signatureImage.onload = function () {
+                canvasContext.drawImage(signatureImage, x, y, 100, 100);
+            };
+            signatureImage.src = getRandomSignature();
         });
 
 

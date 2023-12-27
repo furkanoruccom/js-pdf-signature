@@ -5,7 +5,7 @@
   ## Down Load Button Function
   ----------------------------------------------------------------*/
   $('#download_btn').on('click', function () {
-    var downloadSection = $('#pdfCanvas');
+    var downloadSection = $('#pdfCanvasContainer');
     var cWidth = downloadSection.width();
     var cHeight = downloadSection.height();
     var topLeftMargin = 0; // Boşluğu sıfıra ayarla

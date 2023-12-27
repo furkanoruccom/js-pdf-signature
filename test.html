@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <title>PDF Üzerine İmza Yerleştirme</title>
+
+    <style>
+        body {
+            background-color: black;
+        }
+        #pdfCanvas {
+            position: relative;
+        }
+        .selectionArea {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px dashed blue;
+            cursor: move;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div style="width: 476px; position: relative;">
+        <canvas id="pdfCanvas"></canvas>
+        <div class="selectionArea" id="selectionArea"></div>
+    </div>
+    <br />
+    <button id="placeSignature">İmzayı Yerleştir</button>
+    <button id="download_btn">PDF İndir</button>
+    <div>
+        <button onclick="scaleSignature(1.1)">Büyüt</button>
+        <button onclick="scaleSignature(0.9)">Küçült</button>
+        <button onclick="rotateSignature(10)">Sağa Döndür</button>
+        <button onclick="rotateSignature(-10)">Sola Döndür</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        var pdfCanvas = document.getElementById('pdfCanvas');
+        var selectionArea = document.getElementById('selectionArea');
+        var canvasContext = pdfCanvas.getContext('2d');
+        var dragging = false;
+        var offset = { x: 0, y: 0 };
+
+        var url = 'ORDER.pdf'; // PDF dosyanızın yolu
+        var pdfDoc = null,
+            pageNum = 1,
+            scale = 0.8;
+
+        var signatures = [
+            'imza-1.png',
+            'imza-2.png',
+            'imza-3.png',
+            'imza-4.png',
+            'imza-5.png'
+        ];
+
+        var signatureData = {
+        x: 150, // Başlangıç X konumu
+        y: 150, // Başlangıç Y konumu
+        width: 100, // Başlangıç genişliği
+        height: 100, // Başlangıç yüksekliği
+        rotation: 0, // Dönüş açısı
+        scale: 1, // Ölçek
+        image: null // İmza resmi
+    };
+
+
+        //signatureData.image.src = getRandomSignature();
+
+        function getRandomSignature() {
+            var index = Math.floor(Math.random() * signatures.length);
+            return signatures[index];
+        }
+
+        function renderPDF() {
+            pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                pdfDoc.getPage(pageNum).then(function (page) {
+                    var viewport = page.getViewport({ scale: scale });
+                    pdfCanvas.height = viewport.height;
+                    pdfCanvas.width = viewport.width;
+                    var renderContext = {
+                        canvasContext: canvasContext,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            });
+        }
+
+        function startDrag(e) {
+            dragging = true;
+            var event = e.type.includes('touch') ? e.touches[0] : e;
+            offset.x = event.clientX - selectionArea.getBoundingClientRect().left;
+            offset.y = event.clientY - selectionArea.getBoundingClientRect().top;
+        }
+
+        function doDrag(e) {
+            if (!dragging) return;
+            var event = e.type.includes('touch') ? e.touches[0] : e;
+            selectionArea.style.left = (event.clientX - offset.x) + 'px';
+            selectionArea.style.top = (event.clientY - offset.y) + 'px';
+        }
+
+        function stopDrag(e) {
+            dragging = false;
+        }
+
+        selectionArea.addEventListener('mousedown', startDrag, false);
+        selectionArea.addEventListener('touchstart', startDrag, false);
+
+        window.addEventListener('mousemove', doDrag, false);
+        window.addEventListener('touchmove', doDrag, false);
+
+        window.addEventListener('mouseup', stopDrag, false);
+        window.addEventListener('touchend', stopDrag, false);
+
+        document.getElementById('placeSignature').addEventListener('click', function () {
+            drawSignature();
+        });
+
+        function drawSignature() {
+        if (signatureData.image) {
+            canvasContext.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+            renderPDF(); // PDF'i tekrar çiz
+            canvasContext.save();
+            canvasContext.translate(signatureData.x, signatureData.y);
+            canvasContext.rotate(signatureData.rotation * Math.PI / 180);
+            canvasContext.scale(signatureData.scale, signatureData.scale);
+            canvasContext.drawImage(signatureData.image, -signatureData.width / 2, -signatureData.height / 2, signatureData.width, signatureData.height);
+            canvasContext.restore();
+        }
+    }
+
+    document.getElementById('placeSignature').addEventListener('click', function () {
+        signatureData.image = new Image();
+        signatureData.image.onload = drawSignature;
+        signatureData.image.src = getRandomSignature();
+    });
+
+    function scaleSignature(scaleFactor) {
+        signatureData.scale *= scaleFactor;
+        drawSignature();
+    }
+
+    function rotateSignature(angle) {
+        signatureData.rotation += angle;
+        drawSignature();
+    }
+
+        document.getElementById('download_btn').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            var pdf = new jsPDF();
+            pdf.addImage(pdfCanvas.toDataURL('image/png'), 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            pdf.save('imzalı-dokuman.pdf');
+        });
+
+        renderPDF();
+    </script>
+</body>
+</html>
