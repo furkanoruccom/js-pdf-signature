@@ -43,6 +43,7 @@
             cursor: move;
             /* Görsellik için */
             touch-action: none;
+            border: 1px solid red;
         }
 
         .signature {
@@ -58,10 +59,12 @@
 
         .rotate-handle {
             position: absolute;
-            top: 0px;
-            left: 0px;
+            top: -20px;
+            left: -20px;
             width: 20px;
             height: 20px;
+            font-size: 20px;
+
             cursor: pointer;
         }
     </style>
@@ -229,14 +232,67 @@
             window.addEventListener('mouseup', stopDrag, false);
             window.addEventListener('touchend', stopDrag, false);
         }
-        
+
+
+
+        function makeRotatable(signatureElement, rotateHandle) {
+            var rotation = 0; // Mevcut döndürme açısı
+            var startAngle = 0;
+            var centerPoint;
+
+            function getEventLocation(e) {
+                if (e.touches && e.touches.length) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+                return { x: e.clientX, y: e.clientY };
+            }
+
+            function calculateRotation(e) {
+                var eventLocation = getEventLocation(e);
+                var x = eventLocation.x - centerPoint.x;
+                var y = eventLocation.y - centerPoint.y;
+                return Math.atan2(y, x) * (180 / Math.PI);
+            }
+
+            function onMouseDown(e) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                centerPoint = {
+                    x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
+                    y: signatureElement.getBoundingClientRect().top + signatureElement.offsetHeight / 2
+                };
+                startAngle = calculateRotation(e) - rotation;
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+                window.addEventListener('touchmove', onMove);
+                window.addEventListener('touchend', onUp);
+            }
+
+            function onMove(e) {
+                var angle = calculateRotation(e) - startAngle;
+                signatureElement.style.transform = 'rotate(' + angle + 'deg)';
+            }
+
+            function onUp(e) {
+                rotation = calculateRotation(e) - startAngle; // Güncel döndürme açısını kaydet
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+                window.removeEventListener('touchmove', onMove);
+                window.removeEventListener('touchend', onUp);
+            }
+
+            rotateHandle.addEventListener('mousedown', onMouseDown);
+            rotateHandle.addEventListener('touchstart', onMouseDown);
+        }
+
 
         // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
             var x = parseInt(selectionArea.style.left, 10);
             var y = parseInt(selectionArea.style.top, 10);
             var signatureElement = createSignatureElement(getRandomSignature(), x, y)
-            $(".selectionArea").css({"top":"200px","left":"0"});
+            $(".selectionArea").css({ "top": "200px", "left": "0" });
 
             pdfCanvas.parentElement.appendChild(signatureElement);
 
@@ -272,18 +328,13 @@
                 }
             });
 
-            $(".signatureWrapper").rotatable({
-                start: function (event, ui) {
-                    $(this).data('isTransforming', true);
-                },
-                stop: function (event, ui) {
-                    $(this).data('isTransforming', false);
-                }
-            });
+            makeRotatable(signatureElement, signatureElement.querySelector('.rotate-handle'));
 
             addDraggableToSignature(signatureElement);
 
         });
+
+
 
 
 
