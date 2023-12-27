@@ -13,6 +13,7 @@
 
     var downloadSection = $('#pdfCanvasContainer');
     $(".selectionArea").css("visibility", "hidden");
+    $(".fa-trash").css("visibility", "hidden");
     $(".rotate-handle").css("visibility", "hidden");
     $(".ui-resizable-handle").css("visibility", "hidden");
 
@@ -53,13 +54,15 @@
         );
       }
       $(".selectionArea").css("visibility", "visible");
+      $(".fa-trash").css("visibility", "visible");
+
       $(".rotate-handle").css("visibility", "visible");
       $(".ui-resizable-handle").css("visibility", "visible");
       pdf.save('ivonne-invoice.pdf');
       // canvasContext.putImageData(originalCanvasData, 0, 0);
 
-      
- 
+
+
 
 
     });
