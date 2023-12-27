@@ -1,11 +1,24 @@
 (function ($) {
   'use strict';
 
+
   /*--------------------------------------------------------------
   ## Down Load Button Function
   ----------------------------------------------------------------*/
+  // var originalCanvasData;
   $('#download_btn').on('click', function () {
+    // originalCanvasData = canvasContext.getImageData(0, 0, pdfCanvas.width, pdfCanvas.height);
+    // canvasContext.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+
+
     var downloadSection = $('#pdfCanvasContainer');
+    $(".selectionArea").css("visibility", "hidden");
+    $(".rotate-handle").css("visibility", "hidden");
+    $(".ui-resizable-handle").css("visibility", "hidden");
+
+
+
+
     var cWidth = downloadSection.width();
     var cHeight = downloadSection.height();
     var topLeftMargin = 0; // Boşluğu sıfıra ayarla
@@ -15,9 +28,8 @@
     var canvasImageHeight = cHeight;
     var totalPDFPages = Math.ceil(cHeight / pdfHeight) - 1;
 
-    html2canvas(downloadSection[0], { allowTaint: true }).then(function (
-      canvas
-    ) {
+    html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (
+      canvas) {
       canvas.getContext('2d');
       var imgData = canvas.toDataURL('image/jpeg', 1.0);
       var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
@@ -41,6 +53,15 @@
         );
       }
       pdf.save('ivonne-invoice.pdf');
+      // canvasContext.putImageData(originalCanvasData, 0, 0);
+
+      $(".selectionArea").css("visibility", "visable");
+      $(".rotate-handle").css("visibility", "visable");
+      $(".ui-resizable-handle").css("visibility", "visable");
     });
   });
+
+
+
+
 })(jQuery); // End of use strict

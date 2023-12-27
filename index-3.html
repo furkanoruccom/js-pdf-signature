@@ -21,7 +21,7 @@
 
         .selectionArea {
             position: absolute;
-            top: 0;
+            top: 200px;
             width: 100px;
             height: 100px;
             border: 2px dashed blue;
@@ -41,8 +41,8 @@
 
         .signatureWrapper {
             cursor: move;
-            border: 1px solid red;
             /* Görsellik için */
+            touch-action: none;
         }
 
         .signature {
@@ -54,23 +54,19 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 10px;
-            height: 10px;
-            background: red;
-            cursor: nwse-resize;
         }
 
         .rotate-handle {
             position: absolute;
             top: 0px;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            background: blue;
+            left: 0px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
         }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/flick/jquery-ui.css">
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
 </head>
 
 <body>
@@ -89,14 +85,14 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
     <script src="https://www.jqueryscript.net/demo/CSS3-Rotatable-jQuery-UI/jquery.ui.rotatable.js"></script>
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
     <script src="jspdf.min.js"></script>
     <script src="html2canvas.min.js"></script>
-    <script src="main.js"></script>
+    <script src="download.js"></script>
 
 
 
@@ -166,6 +162,7 @@
         selectionArea.addEventListener('mousedown', startDrag, false);
         selectionArea.addEventListener('touchstart', startDrag, false);
 
+
         window.addEventListener('mousemove', doDrag, false);
         window.addEventListener('touchmove', doDrag, false);
 
@@ -190,6 +187,7 @@
             resizeHandle.classList.add('resize-handle');
 
             var rotateHandle = document.createElement('div');
+            rotateHandle.innerHTML = "<i class='fas fa-sync-alt'></i>";
             rotateHandle.classList.add('rotate-handle');
 
             wrapper.appendChild(img);
@@ -199,27 +197,63 @@
             return wrapper;
         }
 
+        function addDraggableToSignature(signatureElement) {
+            var dragging = false;
+            var offset = { x: 0, y: 0 };
 
+            function startDrag(e) {
+                dragging = true;
+                var event = e.type.includes('touch') ? e.touches[0] : e;
+                offset.x = event.clientX - signatureElement.getBoundingClientRect().left;
+                offset.y = event.clientY - signatureElement.getBoundingClientRect().top;
+                e.preventDefault();
+            }
+
+            function doDrag(e) {
+                if (!dragging || $(signatureElement).data('isTransforming')) return; // Eğer transform işlemi yapılıyorsa sürükleme yapma
+                var event = e.type.includes('touch') ? e.touches[0] : e;
+                signatureElement.style.left = (event.clientX - offset.x) + 'px';
+                signatureElement.style.top = (event.clientY - offset.y) + 'px';
+            }
+
+            function stopDrag(e) {
+                dragging = false;
+            }
+
+            signatureElement.addEventListener('mousedown', startDrag, false);
+            signatureElement.addEventListener('touchstart', startDrag, false);
+
+            window.addEventListener('mousemove', doDrag, false);
+            window.addEventListener('touchmove', doDrag, false);
+
+            window.addEventListener('mouseup', stopDrag, false);
+            window.addEventListener('touchend', stopDrag, false);
+        }
+        
 
         // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
             var x = parseInt(selectionArea.style.left, 10);
             var y = parseInt(selectionArea.style.top, 10);
             var signatureElement = createSignatureElement(getRandomSignature(), x, y)
+            $(".selectionArea").css({"top":"200px","left":"0"});
 
-
-            console.log(x + " " + y);
             pdfCanvas.parentElement.appendChild(signatureElement);
 
             $(".signatureWrapper").css({ "height": "100px", "width": "100px" }).resizable({
                 aspectRatio: true, // Orantılı yeniden boyutlandırmayı etkinleştirir
                 start: function (event, ui) {
+                    $(this).data('isTransforming', true);
+
                     // Yeniden boyutlandırma başladığında orijinal boyutları kaydet
                     var startWidth = ui.size.width;
                     var startHeight = ui.size.height;
 
                     $(this).data('startWidth', startWidth);
                     $(this).data('startHeight', startHeight);
+                },
+                stop: function (event, ui) {
+                    $(this).data('isTransforming', false);
                 },
                 resize: function (event, ui) {
                     // Yeniden boyutlandırma sırasında orantıyı koru
@@ -236,9 +270,18 @@
                         ui.size.width = newWidth;
                     }
                 }
-            }).rotatable().draggable({
-                containment: "#pdfCanvasContainer"
             });
+
+            $(".signatureWrapper").rotatable({
+                start: function (event, ui) {
+                    $(this).data('isTransforming', true);
+                },
+                stop: function (event, ui) {
+                    $(this).data('isTransforming', false);
+                }
+            });
+
+            addDraggableToSignature(signatureElement);
 
         });
 
