@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html  lang="tr">
+
+<head>
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+
+    <title>PDF Üzerine İmza Yerleştirme</title>
+
+
+    <style>
+        body{
+            background-color: black;
+        }
+        #pdfCanvas {
+            position: relative;
+        }
+
+        .selectionArea {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px dashed blue;
+            cursor: move;
+
+        }
+        button{
+            padding:  10px 20px;
+            background-color: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 20px;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div style="width: 476px; position: relative;">
+
+        <canvas id="pdfCanvas"></canvas>
+
+    <div class="selectionArea" id="selectionArea"></div>
+    </div>
+    <br />
+    <button id="placeSignature">İmzayı Yerleştir</button>
+    <button id="download_btn">PDF İndir</button>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+    integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+              var pdfCanvas = document.getElementById('pdfCanvas');
+        var selectionArea = document.getElementById('selectionArea');
+        var canvasContext = pdfCanvas.getContext('2d');
+        var dragging = false;
+        var offset = { x: 0, y: 0 };
+
+        var url = 'ORDER.pdf'; // PDF dosyanızın yolu
+        var pdfDoc = null,
+            pageNum = 1,
+            scale = 0.8;
+
+        var signatures = [
+            'imza-1.png',
+            'imza-2.png',
+            'imza-3.png',
+            'imza-4.png',
+            'imza-5.png'
+        ];
+
+        function getRandomSignature() {
+            var index = Math.floor(Math.random() * signatures.length);
+            return signatures[index];
+        }
+
+        function renderPDF() {
+            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    var viewport = page.getViewport({scale: scale});
+                    pdfCanvas.height = viewport.height;
+                    pdfCanvas.width = viewport.width;
+                    var renderContext = {
+                        canvasContext: canvasContext,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            });
+        }
+
+        function startDrag(e) {
+            dragging = true;
+            var event = e.type.includes('touch') ? e.touches[0] : e;
+            offset.x = event.clientX - selectionArea.getBoundingClientRect().left;
+            offset.y = event.clientY - selectionArea.getBoundingClientRect().top;
+        }
+
+        function doDrag(e) {
+            if (!dragging) return;
+            var event = e.type.includes('touch') ? e.touches[0] : e;
+            selectionArea.style.left = (event.clientX - offset.x) + 'px';
+            selectionArea.style.top = (event.clientY - offset.y) + 'px';
+        }
+
+        function stopDrag(e) {
+            dragging = false;
+        }
+
+        selectionArea.addEventListener('mousedown', startDrag, false);
+        selectionArea.addEventListener('touchstart', startDrag, false);
+
+        window.addEventListener('mousemove', doDrag, false);
+        window.addEventListener('touchmove', doDrag, false);
+
+        window.addEventListener('mouseup', stopDrag, false);
+        window.addEventListener('touchend', stopDrag, false);
+
+        document.getElementById('placeSignature').addEventListener('click', function() {
+            var x = parseInt(selectionArea.style.left, 10);
+            var y = parseInt(selectionArea.style.top, 10);
+            var signatureImage = new Image();
+            signatureImage.onload = function() {
+                canvasContext.drawImage(signatureImage, x, y, 100, 100);
+            };
+            signatureImage.src = getRandomSignature();
+        });
+
+
+
+        renderPDF();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- HTML TO PDF -->
+    <script src="html2Pdf/jspdf.min.js"></script>
+    <script src="html2Pdf/html2canvas.min.js"></script>
+    <script src="html2Pdf/main.js"></script>
+
+ 
+</body>
+
+</html>
