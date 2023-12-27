@@ -46,6 +46,14 @@
 
         }
 
+        .signatureWrapper .fa-trash {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 20px;
+            color: red;
+        }
+
         .signature {
             width: 100%;
             height: 100%;
@@ -191,14 +199,34 @@
 
             var rotateHandle = document.createElement('div');
             rotateHandle.innerHTML = "<i class='fas fa-sync-alt'></i>";
+
+            var trashHandle = document.createElement('div');
+            trashHandle.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+            trashHandle.style.cursor = 'pointer';
+
+
             rotateHandle.classList.add('rotate-handle');
 
             wrapper.appendChild(img);
             wrapper.appendChild(resizeHandle);
             wrapper.appendChild(rotateHandle);
+            wrapper.appendChild(trashHandle);
+
+            trashHandle.addEventListener('touchstart', function (e) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                wrapper.remove();
+            }, { passive: false });
+
+            
+        trashHandle.addEventListener('click', function (e) {
+            wrapper.remove();
+        });
 
             return wrapper;
         }
+
 
         function addDraggableToSignature(signatureElement) {
             var dragging = false;
@@ -235,59 +263,59 @@
 
 
         function makeRotatable(signatureElement, rotateHandle) {
-    var rotation = 0; // Mevcut döndürme açısı
-    var startAngle = 0;
-    var centerPoint;
+            var rotation = 0; // Mevcut döndürme açısı
+            var startAngle = 0;
+            var centerPoint;
 
-    function getEventLocation(e) {
-        if (e.type.startsWith('touch')) {
-            // Birden fazla dokunma noktasının ilkini kullan
-            e = e.touches[0] || e.changedTouches[0];
+            function getEventLocation(e) {
+                if (e.type.startsWith('touch')) {
+                    // Birden fazla dokunma noktasının ilkini kullan
+                    e = e.touches[0] || e.changedTouches[0];
+                }
+                return { x: e.clientX, y: e.clientY };
+            }
+
+            function calculateRotation(e) {
+                var eventLocation = getEventLocation(e);
+                var x = eventLocation.x - centerPoint.x;
+                var y = eventLocation.y - centerPoint.y;
+                return Math.atan2(y, x) * (180 / Math.PI);
+            }
+
+            function onMouseDown(e) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                centerPoint = {
+                    x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
+                    y: signatureElement.getBoundingClientRect().top + signatureElement.offsetHeight / 2
+                };
+                startAngle = calculateRotation(e) - rotation;
+                window.addEventListener('touchmove', onMove, { passive: false });
+                window.addEventListener('touchend', onUp, { passive: false });
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            }
+
+            function onMove(e) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                var angle = calculateRotation(e) - startAngle;
+                signatureElement.style.transform = 'rotate(' + angle + 'deg)';
+            }
+
+            function onUp(e) {
+                rotation = calculateRotation(e) - startAngle; // Güncel döndürme açısını kaydet
+                window.removeEventListener('touchmove', onMove, { passive: false });
+                window.removeEventListener('touchend', onUp, { passive: false });
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+            }
+
+            rotateHandle.addEventListener('touchstart', onMouseDown, { passive: false });
+            rotateHandle.addEventListener('mousedown', onMouseDown);
         }
-        return { x: e.clientX, y: e.clientY };
-    }
-
-    function calculateRotation(e) {
-        var eventLocation = getEventLocation(e);
-        var x = eventLocation.x - centerPoint.x;
-        var y = eventLocation.y - centerPoint.y;
-        return Math.atan2(y, x) * (180 / Math.PI);
-    }
-
-    function onMouseDown(e) {
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-        centerPoint = {
-            x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
-            y: signatureElement.getBoundingClientRect().top + signatureElement.offsetHeight / 2
-        };
-        startAngle = calculateRotation(e) - rotation;
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('touchend', onUp, { passive: false });
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-    }
-
-    function onMove(e) {
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-        var angle = calculateRotation(e) - startAngle;
-        signatureElement.style.transform = 'rotate(' + angle + 'deg)';
-    }
-
-    function onUp(e) {
-        rotation = calculateRotation(e) - startAngle; // Güncel döndürme açısını kaydet
-        window.removeEventListener('touchmove', onMove, { passive: false });
-        window.removeEventListener('touchend', onUp, { passive: false });
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
-    }
-
-    rotateHandle.addEventListener('touchstart', onMouseDown, { passive: false });
-    rotateHandle.addEventListener('mousedown', onMouseDown);
-}
 
         // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
@@ -335,6 +363,7 @@
             addDraggableToSignature(signatureElement);
 
         });
+
 
 
 
