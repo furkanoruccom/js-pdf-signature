@@ -234,58 +234,60 @@
         }
 
 
-
         function makeRotatable(signatureElement, rotateHandle) {
-            var rotation = 0; // Mevcut döndürme açısı
-            var startAngle = 0;
-            var centerPoint;
+    var rotation = 0; // Mevcut döndürme açısı
+    var startAngle = 0;
+    var centerPoint;
 
-            function getEventLocation(e) {
-                if (e.touches && e.touches.length) {
-                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-                return { x: e.clientX, y: e.clientY };
-            }
-
-            function calculateRotation(e) {
-                var eventLocation = getEventLocation(e);
-                var x = eventLocation.x - centerPoint.x;
-                var y = eventLocation.y - centerPoint.y;
-                return Math.atan2(y, x) * (180 / Math.PI);
-            }
-
-            function onMouseDown(e) {
-                if (e.cancelable) {
-                    e.preventDefault();
-                }
-                centerPoint = {
-                    x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
-                    y: signatureElement.getBoundingClientRect().top + signatureElement.offsetHeight / 2
-                };
-                startAngle = calculateRotation(e) - rotation;
-                window.addEventListener('mousemove', onMove);
-                window.addEventListener('mouseup', onUp);
-                window.addEventListener('touchmove', onMove);
-                window.addEventListener('touchend', onUp);
-            }
-
-            function onMove(e) {
-                var angle = calculateRotation(e) - startAngle;
-                signatureElement.style.transform = 'rotate(' + angle + 'deg)';
-            }
-
-            function onUp(e) {
-                rotation = calculateRotation(e) - startAngle; // Güncel döndürme açısını kaydet
-                window.removeEventListener('mousemove', onMove);
-                window.removeEventListener('mouseup', onUp);
-                window.removeEventListener('touchmove', onMove);
-                window.removeEventListener('touchend', onUp);
-            }
-
-            rotateHandle.addEventListener('mousedown', onMouseDown);
-            rotateHandle.addEventListener('touchstart', onMouseDown);
+    function getEventLocation(e) {
+        if (e.type.startsWith('touch')) {
+            // Birden fazla dokunma noktasının ilkini kullan
+            e = e.touches[0] || e.changedTouches[0];
         }
+        return { x: e.clientX, y: e.clientY };
+    }
 
+    function calculateRotation(e) {
+        var eventLocation = getEventLocation(e);
+        var x = eventLocation.x - centerPoint.x;
+        var y = eventLocation.y - centerPoint.y;
+        return Math.atan2(y, x) * (180 / Math.PI);
+    }
+
+    function onMouseDown(e) {
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+        centerPoint = {
+            x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
+            y: signatureElement.getBoundingClientRect().top + signatureElement.offsetHeight / 2
+        };
+        startAngle = calculateRotation(e) - rotation;
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onUp, { passive: false });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    }
+
+    function onMove(e) {
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+        var angle = calculateRotation(e) - startAngle;
+        signatureElement.style.transform = 'rotate(' + angle + 'deg)';
+    }
+
+    function onUp(e) {
+        rotation = calculateRotation(e) - startAngle; // Güncel döndürme açısını kaydet
+        window.removeEventListener('touchmove', onMove, { passive: false });
+        window.removeEventListener('touchend', onUp, { passive: false });
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+    }
+
+    rotateHandle.addEventListener('touchstart', onMouseDown, { passive: false });
+    rotateHandle.addEventListener('mousedown', onMouseDown);
+}
 
         // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
