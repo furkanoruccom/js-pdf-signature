@@ -21,8 +21,7 @@
 
         .selectionArea {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 200px;
             width: 100px;
             height: 100px;
             border: 2px dashed blue;
@@ -82,20 +81,15 @@
 </head>
 
 <body>
-    <div>
-        <button id="placeSignature" type="button">İmzayı Yerleştir</button>
-        <button id="download_btn" type="button">PDF İndir</button>
+    <div id="pdfCanvasContainer" style="width: 476px; height: 673px; position: relative;">
 
-        <button id="prevPage" type="button">Önceki Sayfa</button>
-        <button id="nextPage" type="button">Sonraki Sayfa</button>
-        <div id="page_num"></div>
-    </div>
-    <div id="pdfCanvasContainer" style="width: 476px; position: relative;">
-
+        <canvas id="pdfCanvas"></canvas>
 
         <div class="selectionArea" id="selectionArea"></div>
     </div>
     <br />
+    <button id="placeSignature">İmzayı Yerleştir</button>
+    <button id="download_btn">PDF İndir</button>
 
 
 
@@ -113,7 +107,6 @@
 
 
 
-    <canvas id="pdfCanvas"></canvas>
 
     <script>
         var pdfCanvas = document.getElementById('pdfCanvas');
@@ -146,47 +139,35 @@
         function renderPDF() {
             pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
                 pdfDoc = pdfDoc_;
-                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-                    pdfDoc.getPage(pageNum).then(function (page) {
-                        // Her sayfa için yeni bir canvas oluştur
-                        var canvas = document.createElement('canvas');
-                        canvas.id = 'pdfCanvas_' + pageNum;
-                        $("#pdfCanvasContainer").append(canvas);
-
-                        var viewport = page.getViewport({ scale: scale });
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        var renderContext = {
-                            canvasContext: canvas.getContext('2d'),
-                            viewport: viewport
-                        };
-                        page.render(renderContext);
-                    });
-                }
+                pdfDoc.getPage(pageNum).then(function (page) {
+                    var viewport = page.getViewport({ scale: scale });
+                    pdfCanvas.height = viewport.height;
+                    pdfCanvas.width = viewport.width;
+                    var renderContext = {
+                        canvasContext: canvasContext,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
             });
         }
 
         function startDrag(e) {
-            // Dokunmatik olaylar için pozisyonu al
-            var event = e.type.includes('touch') ? e.touches[0] : e;
-            offset.x = event.clientX - selectionArea.offsetLeft;
-            offset.y = event.clientY - selectionArea.offsetTop;
             dragging = true;
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
+            var event = e.type.includes('touch') ? e.touches[0] : e;
+            offset.x = event.clientX - selectionArea.getBoundingClientRect().left;
+            offset.y = event.clientY - selectionArea.getBoundingClientRect().top;
         }
 
         function doDrag(e) {
             if (!dragging) return;
-            // Dokunmatik olaylar için pozisyonu al
             var event = e.type.includes('touch') ? e.touches[0] : e;
             selectionArea.style.left = (event.clientX - offset.x) + 'px';
             selectionArea.style.top = (event.clientY - offset.y) + 'px';
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
         }
 
         function stopDrag(e) {
             dragging = false;
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
         }
 
         selectionArea.addEventListener('mousedown', startDrag, false);
@@ -238,10 +219,10 @@
                 wrapper.remove();
             }, { passive: false });
 
-
-            trashHandle.addEventListener('click', function (e) {
-                wrapper.remove();
-            });
+            
+        trashHandle.addEventListener('click', function (e) {
+            wrapper.remove();
+        });
 
             return wrapper;
         }
@@ -252,25 +233,22 @@
             var offset = { x: 0, y: 0 };
 
             function startDrag(e) {
+                dragging = true;
                 var event = e.type.includes('touch') ? e.touches[0] : e;
                 offset.x = event.clientX - signatureElement.getBoundingClientRect().left;
                 offset.y = event.clientY - signatureElement.getBoundingClientRect().top;
-                dragging = true;
-                e.preventDefault(); // Tarayıcı davranışını engelle
+                e.preventDefault();
             }
 
             function doDrag(e) {
-                if (!dragging || $(signatureElement).data('isTransforming')) return;
+                if (!dragging || $(signatureElement).data('isTransforming')) return; // Eğer transform işlemi yapılıyorsa sürükleme yapma
                 var event = e.type.includes('touch') ? e.touches[0] : e;
-                var parentOffset = signatureElement.offsetParent ? signatureElement.offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
-                signatureElement.style.left = (event.clientX - offset.x - parentOffset.left) + 'px';
-                signatureElement.style.top = (event.clientY - offset.y - parentOffset.top) + 'px';
-                e.preventDefault(); // Tarayıcı davranışını engelle
+                signatureElement.style.left = (event.clientX - offset.x) + 'px';
+                signatureElement.style.top = (event.clientY - offset.y) + 'px';
             }
 
             function stopDrag(e) {
                 dragging = false;
-                e.preventDefault(); // Tarayıcı davranışını engelle
             }
 
             signatureElement.addEventListener('mousedown', startDrag, false);
@@ -281,7 +259,6 @@
 
             window.addEventListener('mouseup', stopDrag, false);
             window.addEventListener('touchend', stopDrag, false);
-
         }
 
 
@@ -342,11 +319,10 @@
 
         // İmza yerleştirme fonksiyonunu değiştirelim
         document.getElementById('placeSignature').addEventListener('click', function () {
-            alert("imza yerleştirme");
             var x = parseInt(selectionArea.style.left, 10);
             var y = parseInt(selectionArea.style.top, 10);
             var signatureElement = createSignatureElement(getRandomSignature(), x, y)
-            $(".selectionArea").css({ "left": "0" });
+            $(".selectionArea").css({ "top": "200px", "left": "0" });
 
             pdfCanvas.parentElement.appendChild(signatureElement);
 
