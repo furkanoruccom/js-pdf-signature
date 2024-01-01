@@ -17,35 +17,39 @@
     var canvasImageHeight = cHeight;
     var totalPDFPages = Math.ceil(cHeight / 1263) - 1;
 
-    html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
-      var imgData = canvas.toDataURL('image/jpeg', 1.0);
-      var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
+    try {
+      html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
+        var imgData = canvas.toDataURL('image/jpeg', 1.0);
+        var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
 
-      pdf.addImage(
-        imgData,
-        'JPG',
-        topLeftMargin,
-        topLeftMargin,
-        canvasImageWidth,
-        canvasImageHeight
-      );
-
-      for (var i = 1; i <= totalPDFPages; i++) {
-        pdf.addPage(pdfWidth, pdfHeight);
         pdf.addImage(
           imgData,
           'JPG',
           topLeftMargin,
-          -(pdfHeight * i) + topLeftMargin * 0,
+          topLeftMargin,
           canvasImageWidth,
           canvasImageHeight
         );
-      }
 
-      $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
+        for (var i = 1; i <= totalPDFPages; i++) {
+          pdf.addPage(pdfWidth, pdfHeight);
+          pdf.addImage(
+            imgData,
+            'JPG',
+            topLeftMargin,
+            -(pdfHeight * i) + topLeftMargin * 0,
+            canvasImageWidth,
+            canvasImageHeight
+          );
+        }
 
-      pdf.save('ivonne-invoice.pdf');
-    });
+        $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
+
+        pdf.save('ivonne-invoice.pdf');
+      });
+    } catch (error) {
+      alert("İndirme işlemi sırasında bir hata oluştu: " + error.message);
+    }
   });
 
 })(jQuery);
