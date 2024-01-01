@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
 
     <title>PDF Üzerine İmza Yerleştirme</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
     <style>
         body {
@@ -83,11 +83,11 @@
 
 <body>
     <div>
-        <button id="placeSignature" type="button">İmzayı Yerleştir</button>
-        <button id="download_btn" type="button">PDF İndir</button>
+        <button id="placeSignature" class="btn btn-primary" type="button">İmzayı Yerleştir</button>
+        <button id="download_btn" class="btn btn-primary" type="button">PDF İndir</button>
 
-        <button id="prevPage" type="button">Önceki Sayfa</button>
-        <button id="nextPage" type="button">Sonraki Sayfa</button>
+        <button id="prevPage" class="btn btn-primary" type="button">Önceki Sayfa</button>
+        <button id="nextPage" class="btn btn-primary" type="button">Sonraki Sayfa</button>
         <div id="page_num"></div>
     </div>
     <div id="pdfCanvasContainer" style="width: 476px; position: relative;">
@@ -172,7 +172,9 @@
             offset.x = event.clientX - selectionArea.offsetLeft;
             offset.y = event.clientY - selectionArea.offsetTop;
             dragging = true;
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
+
+            document.body.style.overflow = 'hidden';
+   
         }
 
         function doDrag(e) {
@@ -181,23 +183,24 @@
             var event = e.type.includes('touch') ? e.touches[0] : e;
             selectionArea.style.left = (event.clientX - offset.x) + 'px';
             selectionArea.style.top = (event.clientY - offset.y) + 'px';
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
+ 
         }
 
         function stopDrag(e) {
             dragging = false;
-            e.preventDefault(); // Tarayıcı varsayılan davranışını engelle
+
+            document.body.style.overflow = '';
         }
 
         selectionArea.addEventListener('mousedown', startDrag, false);
-        selectionArea.addEventListener('touchstart', startDrag, false);
+        selectionArea.addEventListener('touchstart', startDrag, false,  { passive: false });
 
 
         window.addEventListener('mousemove', doDrag, false);
-        window.addEventListener('touchmove', doDrag, false);
+        window.addEventListener('touchmove', doDrag, false, { passive: false });
 
         window.addEventListener('mouseup', stopDrag, false);
-        window.addEventListener('touchend', stopDrag, false);
+        window.addEventListener('touchend', stopDrag, false, { passive: false });
 
         // İmza elementini yaratan fonksiyon
         function createSignatureElement(src, x, y) {
@@ -256,7 +259,9 @@
                 offset.x = event.clientX - signatureElement.getBoundingClientRect().left;
                 offset.y = event.clientY - signatureElement.getBoundingClientRect().top;
                 dragging = true;
-                e.preventDefault(); // Tarayıcı davranışını engelle
+
+                document.body.style.overflow = 'hidden';
+           
             }
 
             function doDrag(e) {
@@ -265,22 +270,25 @@
                 var parentOffset = signatureElement.offsetParent ? signatureElement.offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
                 signatureElement.style.left = (event.clientX - offset.x - parentOffset.left) + 'px';
                 signatureElement.style.top = (event.clientY - offset.y - parentOffset.top) + 'px';
-                e.preventDefault(); // Tarayıcı davranışını engelle
+
             }
 
             function stopDrag(e) {
+                
                 dragging = false;
-                e.preventDefault(); // Tarayıcı davranışını engelle
+
+                document.body.style.overflow = '';
+
             }
 
             signatureElement.addEventListener('mousedown', startDrag, false);
-            signatureElement.addEventListener('touchstart', startDrag, false);
+            signatureElement.addEventListener('touchstart', startDrag, false, { passive: false });
 
             window.addEventListener('mousemove', doDrag, false);
-            window.addEventListener('touchmove', doDrag, false);
+            window.addEventListener('touchmove', doDrag, false, { passive: false });
 
             window.addEventListener('mouseup', stopDrag, false);
-            window.addEventListener('touchend', stopDrag, false);
+            window.addEventListener('touchend', stopDrag, false, { passive: false });
 
         }
 
