@@ -1,31 +1,39 @@
 (function ($) {
   'use strict';
 
+
   /*--------------------------------------------------------------
   ## Down Load Button Function
   ----------------------------------------------------------------*/
+  // var originalCanvasData;
   $('#download_btn').on('click', function () {
+    // originalCanvasData = canvasContext.getImageData(0, 0, pdfCanvas.width, pdfCanvas.height);
+    // canvasContext.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+
+
     var downloadSection = $('#pdfCanvasContainer');
     $(".selectionArea").css("visibility", "hidden");
     $(".fa-trash").css("visibility", "hidden");
     $(".rotate-handle").css("visibility", "hidden");
     $(".ui-resizable-handle").css("visibility", "hidden");
 
+
+
+
     var cWidth = downloadSection.width();
     var cHeight = downloadSection.height();
-    var topLeftMargin = 0;
+    var topLeftMargin = 0; // Boşluğu sıfıra ayarla
     var pdfWidth = cWidth + topLeftMargin * 2;
-    var pdfHeight = 1263;
+    var pdfHeight = pdfWidth * 1.5 + topLeftMargin * 2;
     var canvasImageWidth = cWidth;
     var canvasImageHeight = cHeight;
-    var totalPDFPages = Math.ceil(cHeight / 1263) - 1;
+    var totalPDFPages = Math.ceil(cHeight / pdfHeight) - 1;
 
     html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (
       canvas) {
       canvas.getContext('2d');
       var imgData = canvas.toDataURL('image/jpeg', 1.0);
       var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
-
       pdf.addImage(
         imgData,
         'JPG',
@@ -34,7 +42,6 @@
         canvasImageWidth,
         canvasImageHeight
       );
-
       for (var i = 1; i <= totalPDFPages; i++) {
         pdf.addPage(pdfWidth, pdfHeight);
         pdf.addImage(
@@ -46,27 +53,22 @@
           canvasImageHeight
         );
       }
-
       $(".selectionArea").css("visibility", "visible");
       $(".fa-trash").css("visibility", "visible");
+
       $(".rotate-handle").css("visibility", "visible");
       $(".ui-resizable-handle").css("visibility", "visible");
+      pdf.save('ivonne-invoice.pdf');
+      // canvasContext.putImageData(originalCanvasData, 0, 0);
 
-      // Mobil cihazlarda indirme işlemi için
-      var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        // Mobil cihazlarda indirme işlemi
-        var blob = pdf.output('blob');
-        var blobURL = URL.createObjectURL(blob);
-        var link = document.createElement('a');
-        link.href = blobURL;
-        link.download = 'ivonne-invoice.pdf';
-        link.click();
-      } else {
-        // Diğer cihazlarda indirme işlemi
-        pdf.save('ivonne-invoice.pdf');
-      }
+
+
+
+
     });
   });
 
-})(jQuery);
+
+
+
+})(jQuery); // End of use strict
