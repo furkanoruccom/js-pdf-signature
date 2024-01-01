@@ -24,10 +24,10 @@
     var cHeight = downloadSection.height();
     var topLeftMargin = 0; // Boşluğu sıfıra ayarla
     var pdfWidth = cWidth + topLeftMargin * 2;
-    var pdfHeight = pdfWidth * 1.5 + topLeftMargin * 2;
+    var pdfHeight = 1263;
     var canvasImageWidth = cWidth;
     var canvasImageHeight = cHeight;
-    var totalPDFPages = Math.ceil(cHeight / pdfHeight) - 1;
+    var totalPDFPages = Math.ceil(cHeight / 1263) - 1;
 
     html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (
       canvas) {

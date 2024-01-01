@@ -83,17 +83,13 @@
 </head>
 
 <body>
-    <div>
-        <button id="placeSignature" class="btn btn-primary" type="button">İmzayı Yerleştir</button>
-        <button id="download_btn" class="btn btn-primary" type="button">PDF İndir</button>
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+        <button id="placeSignature" class="btn btn-primary btn-lg" type="button">İmzayı Yerleştir</button>
+        <button id="download_btn" class="btn btn-primary btn-lg" type="button">PDF İndir</button>
 
-        <button id="prevPage" class="btn btn-primary" type="button">Önceki Sayfa</button>
-        <button id="nextPage" class="btn btn-primary" type="button">Sonraki Sayfa</button>
         <div id="page_num"></div>
     </div>
-    <div id="pdfCanvasContainer" style="width: 476px; position: relative;">
-
-
+    <div id="pdfCanvasContainer" style="width: 892px; position: relative;">
         <div class="selectionArea" id="selectionArea"></div>
     </div>
     <br />
@@ -114,22 +110,21 @@
 
 
 
-    <canvas id="pdfCanvas"></canvas>
 
     <script>
-        var pdfCanvas = document.getElementById('pdfCanvas');
+
         var selectionArea = document.getElementById('selectionArea');
         // selectionArea.draggable({
         //     containment: "#pdfCanvasContainer"
         // });
-        var canvasContext = pdfCanvas.getContext('2d');
+
         var dragging = false;
         var offset = { x: 0, y: 0 };
 
         var url = 'phd.pdf'; // PDF dosyanızın yolu
         var pdfDoc = null,
             pageNum = 1,
-            scale = 0.8;
+            scale = 1.5;
 
         var signatures = [
             'imza-1.png',
@@ -152,6 +147,10 @@
                         // Her sayfa için yeni bir canvas oluştur
                         var canvas = document.createElement('canvas');
                         canvas.id = 'pdfCanvas_' + pageNum;
+
+                        // Burada canvas'a bir class ekleyin
+                        canvas.className = 'pdf-page-canvas'; // Örnek class adı
+
                         $("#pdfCanvasContainer").append(canvas);
 
                         var viewport = page.getViewport({ scale: scale });
@@ -175,7 +174,7 @@
             offset.x = event.clientX - selectionArea.offsetLeft;
             offset.y = event.clientY - selectionArea.offsetTop;
             dragging = true;
-
+            document.body.style.overflow = 'hidden';
 
             if (dragging) {
                 e.preventDefault();
@@ -191,7 +190,7 @@
             selectionArea.style.left = (event.clientX - offset.x) + 'px';
             selectionArea.style.top = (event.clientY - offset.y) + 'px';
 
-
+            document.body.style.overflow = '';
             if (dragging) {
                 e.preventDefault();
             }
@@ -369,7 +368,7 @@
             var signatureElement = createSignatureElement(getRandomSignature(), x, y)
             $(".selectionArea").css({ "left": "0" });
 
-            pdfCanvas.parentElement.appendChild(signatureElement);
+            $("#pdfCanvasContainer").append(signatureElement);
 
             $(".signatureWrapper").css({ "height": "100px", "width": "100px" }).resizable({
                 aspectRatio: true, // Orantılı yeniden boyutlandırmayı etkinleştirir
