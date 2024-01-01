@@ -52,20 +52,9 @@
       $(".rotate-handle").css("visibility", "visible");
       $(".ui-resizable-handle").css("visibility", "visible");
 
-      // Mobil cihazlarda indirme işlemi için
-      var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        // Mobil cihazlarda indirme işlemi
-        var blob = pdf.output('blob');
-        var blobURL = URL.createObjectURL(blob);
-        var link = document.createElement('a');
-        link.href = blobURL;
-        link.download = 'ivonne-invoice.pdf';
-        link.click();
-      } else {
-        // Diğer cihazlarda indirme işlemi
+ 
         pdf.save('ivonne-invoice.pdf');
-      }
+  
     });
   });
 
