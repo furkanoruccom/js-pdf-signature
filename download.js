@@ -2,14 +2,11 @@
   'use strict';
 
   /*--------------------------------------------------------------
-  ## Down Load Button Function
+  ## İndirme Butonu İşlevi
   ----------------------------------------------------------------*/
   $('#download_btn').on('click', function () {
     var downloadSection = $('#pdfCanvasContainer');
-    $(".selectionArea").css("visibility", "hidden");
-    $(".fa-trash").css("visibility", "hidden");
-    $(".rotate-handle").css("visibility", "hidden");
-    $(".ui-resizable-handle").css("visibility", "hidden");
+    $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "hidden");
 
     var cWidth = downloadSection.width();
     var cHeight = downloadSection.height();
@@ -20,9 +17,7 @@
     var canvasImageHeight = cHeight;
     var totalPDFPages = Math.ceil(cHeight / 1263) - 1;
 
-    html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (
-      canvas) {
-      canvas.getContext('2d');
+    html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
       var imgData = canvas.toDataURL('image/jpeg', 1.0);
       var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
 
@@ -47,14 +42,9 @@
         );
       }
 
-      $(".selectionArea").css("visibility", "visible");
-      $(".fa-trash").css("visibility", "visible");
-      $(".rotate-handle").css("visibility", "visible");
-      $(".ui-resizable-handle").css("visibility", "visible");
+      $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
 
- 
-        pdf.save('ivonne-invoice.pdf');
-  
+      pdf.save('ivonne-invoice.pdf');
     });
   });
 
