@@ -21,7 +21,7 @@ try {
 
       html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
         var imgData = canvas.toDataURL('image/jpeg', 1.0);
-        var pdf = new jsPDF('p', 'pt', 
+        var pdf = new jsPDF('p', 'pt',  
          [pdfWidth, pdfHeight]);
 
         pdf.addImage(
@@ -47,7 +47,6 @@ try {
 
         $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
 
-        pdf.save('ivonne-invoice.pdf');
       });
 
     });

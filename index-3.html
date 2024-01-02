@@ -12,9 +12,22 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
     <style>
-        body {
-            background-color: black;
+        .btn-close-signature {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            height: 50px;
+            width: 50px;
+            background-color: red;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            z-index: 9999;
         }
+
+
 
         #pdfCanvas {
             position: relative;
@@ -77,22 +90,70 @@
 
             cursor: pointer;
         }
+
+        .signaturebtns {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 9999;
+        }
     </style>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/flick/jquery-ui.css">
     <link rel="stylesheet" href="fontawesome/css/all.min.css">
 </head>
 
 <body>
-    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
-        <button id="placeSignature" class="btn btn-primary btn-lg" type="button">İmzayı Yerleştir</button>
+    <div class="signaturebtns">
+        <button id="placeSignature" class="btn btn-primary btn-lg px-5" type="button">İmzayı
+            Yerleştir <i class="fa-solid fa-file-signature ms-2"></i></button>
         <button id="download_btn" class="btn btn-primary btn-lg" type="button">PDF İndir</button>
 
         <div id="page_num"></div>
     </div>
-    <div id="pdfCanvasContainer" style="width: 892px; position: relative;">
-        <div class="selectionArea" id="selectionArea"></div>
+
+    <button type="button" class="btn-close-signature" id="modalSignatureClose">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSignature">
+        Launch static backdrop modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" style="overflow-x: scroll;" id="modalSignature" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSignatureLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-xl" style="--bs-modal-width:  1070px !important;">
+            <div class="modal-content" style="min-width: 1070px; max-width: 1070px; width: 1070px; ">
+                <div class="modal-body bg-dark p-0">
+
+
+
+
+
+                    <div id="pdfCanvasContainer" style="width: 1070px; position: relative;">
+                        <div class="selectionArea" id="selectionArea"></div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+                </div>
+            </div>
+        </div>
     </div>
-    <br />
+
+
+
+
+
 
 
 
@@ -106,17 +167,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
     <script src="jspdf.min.js"></script>
     <script src="html2canvas.min.js"></script>
-    <script src="download.js"></script>
 
 
 
 
     <script>
 
+        // Başlangıçta .selectionArea'nın offsetTop değerini al
         var selectionArea = document.getElementById('selectionArea');
-        // selectionArea.draggable({
-        //     containment: "#pdfCanvasContainer"
-        // });
+        var startPosition = selectionArea.offsetTop;
+        $("#modalSignature").scroll(function () {
+            $(".selectionArea").css({ "top": startPosition + $(this).scrollTop() + "px", "position": "absolute" });
+        });
+
+
+        $(".btn-close-signature").hide();
+        $(".signaturebtns").hide();
+
+
+        $("#modalSignature").on('shown.bs.modal', function () {
+            $(".btn-close-signature").toggle();
+            $(".signaturebtns").toggle();
+
+        });
+
+        $(".btn-close-signature").click(function () {
+            $(".btn-close-signature").toggle();
+            $(".signaturebtns").toggle();
+            $("#modalSignature").modal('hide');
+        });
+
+
 
         var dragging = false;
         var offset = { x: 0, y: 0 };
@@ -124,7 +205,7 @@
         var url = 'phd.pdf'; // PDF dosyanızın yolu
         var pdfDoc = null,
             pageNum = 1,
-            scale = 1.5;
+            scale = 1.8;
 
         var signatures = [
             'imza-1.png',
@@ -191,6 +272,8 @@
             selectionArea.style.top = (event.clientY - offset.y) + 'px';
 
             document.body.style.overflow = '';
+
+
             if (dragging) {
                 e.preventDefault();
             }
@@ -414,9 +497,46 @@
 
 
         renderPDF();
+
+
+
+        $('#download_btn').on('click', function () {
+            var downloadSection = $('#pdfCanvasContainer');
+            $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "hidden");
+
+            var cWidth = downloadSection.width();
+            var cHeight = downloadSection.height();
+            var topLeftMargin = 0;
+            var pdfWidth = cWidth + topLeftMargin * 2;
+            var pdfHeight = 1515;
+            var canvasImageWidth = cWidth;
+            var canvasImageHeight = cHeight;
+            var totalPDFPages = Math.ceil(cHeight / 1515) -1;
+
+            html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
+                var imgData = canvas.toDataURL('image/jpeg', 1.0);
+                var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
+
+                pdf.addImage(imgData, 'JPG', topLeftMargin, topLeftMargin, canvasImageWidth, canvasImageHeight);
+
+                for (var i = 2; i <= totalPDFPages; i++) {
+                    pdf.addPage(pdfWidth, pdfHeight);
+                    pdf.addImage(imgData, 'JPG', topLeftMargin, -(pdfHeight * (i - 1)) + topLeftMargin, canvasImageWidth, canvasImageHeight);
+                }
+
+                $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
+                pdf.save("download.pdf");
+            });
+        });
+
     </script>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
