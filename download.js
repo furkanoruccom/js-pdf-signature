@@ -3,10 +3,9 @@ try {
     'use strict';
 
     /*--------------------------------------------------------------
-    ## Download Button Function
+    ## İndirme Butonu İşlevi
     ----------------------------------------------------------------*/
-    $('#download_btn').on('touchstart click', function (e) {
-      e.preventDefault(); // Prevents multiple firing of the event on mobile
+    $('#download_btn').on('click', function () {
       var downloadSection = $('#pdfCanvasContainer');
       $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "hidden");
 
@@ -19,16 +18,10 @@ try {
       var canvasImageHeight = cHeight;
       var totalPDFPages = Math.ceil(cHeight / 1263) - 1;
 
-      html2canvas(downloadSection[0], { 
-        allowTaint: true, 
-        useCORS: true,
-        logging: true, // Enables logging for debugging
-        scale: 0.5, // Reduces image size to support memory limitations on mobile
-        width: cWidth,
-        height: cHeight
-      }).then(function (canvas) {
+
+      html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
         var imgData = canvas.toDataURL('image/jpeg', 1.0);
-        var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
+        var pdf = new jsPDF('p', 'pt', 'a4'[pdfWidth, pdfHeight]);
 
         pdf.addImage(
           imgData,
@@ -53,15 +46,7 @@ try {
 
         $(".selectionArea, .fa-trash, .rotate-handle, .ui-resizable-handle").css("visibility", "visible");
 
-        // Check if the browser is on a mobile device
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          // Open PDF in a new window on mobile devices (workaround for download issues)
-          var pdfWindow = window.open("");
-          pdfWindow.document.write("<iframe width='100%' height='100%' src='" + pdf.output('datauristring') + "'></iframe>");
-        } else {
-          // For non-mobile browsers
-          pdf.save('ivonne-invoice.pdf');
-        }
+        pdf.save('ivonne-invoice.pdf');
       });
 
     });
@@ -69,5 +54,5 @@ try {
   })(jQuery);
 
 } catch (error) {
-  alert("An error occurred during the download process: " + error.message);
+  alert("İndirme işlemi sırasında bir hata oluştu: " + error.message);
 }
