@@ -177,7 +177,7 @@
             document.body.style.overflow = 'hidden';
 
             if (dragging) {
-                //e.preventDefault();
+                e.preventDefault();
             }
         }
 
@@ -192,7 +192,7 @@
 
             document.body.style.overflow = '';
             if (dragging) {
-                //e.preventDefault();
+                e.preventDefault();
             }
         }
 
@@ -244,7 +244,7 @@
 
             trashHandle.addEventListener('touchstart', function (e) {
                 if (e.cancelable) {
-                    //e.preventDefault();
+                    e.preventDefault();
                 }
                 wrapper.remove();
             }, { passive: false });
@@ -271,7 +271,7 @@
 
 
                 if (dragging) {
-                    //e.preventDefault();
+                    e.preventDefault();
                 }
             }
 
@@ -284,7 +284,7 @@
                 signatureElement.style.top = (event.clientY - offset.y - parentOffset.top) + 'px';
 
                 if (dragging) {
-                    //e.preventDefault();
+                    e.preventDefault();
                 }
 
             }
@@ -327,7 +327,7 @@
 
             function onMouseDown(e) {
                 if (e.cancelable) {
-                    //e.preventDefault();
+                    e.preventDefault();
                 }
                 centerPoint = {
                     x: signatureElement.getBoundingClientRect().left + signatureElement.offsetWidth / 2,
@@ -342,7 +342,7 @@
 
             function onMove(e) {
                 if (e.cancelable) {
-                    //e.preventDefault();
+                    e.preventDefault();
                 }
                 var angle = calculateRotation(e) - startAngle;
                 signatureElement.style.transform = 'rotate(' + angle + 'deg)';
