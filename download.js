@@ -21,7 +21,7 @@ try {
 
       html2canvas(downloadSection[0], { allowTaint: true, useCORS: true }).then(function (canvas) {
         var imgData = canvas.toDataURL('image/jpeg', 1.0);
-        var pdf = new jsPDF('p', 'pt', [pdfWidth, pdfHeight]);
+        var pdf = new jsPDF('p', 'pt', 'a4'[pdfWidth, pdfHeight]);
 
         pdf.addImage(
           imgData,
