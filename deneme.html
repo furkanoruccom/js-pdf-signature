@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sınırlı Sürükleme ile Div İçinde Sürükleme</title>
+    <style>
+        #container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        #draggable {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            position: absolute;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="draggable"></div>
+</div>
+
+<script>
+    var container = document.getElementById('container'),
+        draggable = document.getElementById('draggable'),
+        isDragging = false,
+        offsetX = 0,
+        offsetY = 0;
+
+    draggable.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        offsetX = e.clientX - draggable.getBoundingClientRect().left;
+        offsetY = e.clientY - draggable.getBoundingClientRect().top;
+        container.style.cursor = 'move';
+    });
+
+    container.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            var moveX = e.clientX - offsetX;
+            var moveY = e.clientY - offsetY;
+
+            // Sınırları hesapla
+            var rightLimit = container.offsetWidth - draggable.offsetWidth;
+            var bottomLimit = container.offsetHeight - draggable.offsetHeight;
+
+            // Sınırlar içinde kalmasını sağla
+            moveX = Math.min(Math.max(0, moveX), rightLimit);
+            moveY = Math.min(Math.max(0, moveY), bottomLimit);
+
+            draggable.style.left = moveX + 'px';
+            draggable.style.top = moveY + 'px';
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isDragging) {
+            isDragging = false;
+            container.style.cursor = 'default';
+        }
+    });
+</script>
+
+</body>
+</html>
