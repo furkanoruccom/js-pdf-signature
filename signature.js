@@ -3,63 +3,56 @@ function addDraggableToSignature(signatureElement) {
     var offset = { x: 0, y: 0 };
   
     function startDrag(e) {
-  
+      // Dokunmatik olaylar için pozisyonu ayarla
       var event = e.type.includes('touch') ? e.touches[0] : e;
       offset.x = event.clientX - signatureElement.getBoundingClientRect().left;
       offset.y = event.clientY - signatureElement.getBoundingClientRect().top;
       dragging = true;
   
-  
-      if (dragging) {
+      // Varsa varsayılan davranışı engelle
+      if (e.cancelable) {
         e.preventDefault();
       }
     }
   
     function doDrag(e) {
-  
-  
-      
-      
       if (!dragging || $(signatureElement).data('isTransforming')) return;
   
+      var event = e.type.includes('touch') ? e.touches[0] : e;
+      var newX = event.clientX - offset.x;
+      var newY = event.clientY - offset.y;
   
+      // Container sınırlarını hesapla ve uygula
+      var containerRect = document.getElementById('pdfCanvasContainer').getBoundingClientRect();
+      newX = Math.max(containerRect.left, Math.min(containerRect.right - signatureElement.offsetWidth, newX));
+      newY = Math.max(containerRect.top, Math.min(containerRect.bottom - signatureElement.offsetHeight, newY));
   
-      var container = document.getElementById('pdfCanvasContainer');
-      var containerRect = container.getBoundingClientRect();
-      var signatureRect = signatureElement.getBoundingClientRect();
-      
-      var minX = containerRect.left - signatureRect.left + signatureElement.offsetLeft;
-      var maxX = containerRect.right - signatureRect.right + signatureElement.offsetLeft - signatureRect.width +100;
+      // Container içindeki yeni konumu ayarla
+      signatureElement.style.left = newX - containerRect.left + 'px';
+      signatureElement.style.top = newY - containerRect.top + 'px';
   
-      var minY = containerRect.top - signatureRect.top + signatureElement.offsetTop;
-      var maxY = containerRect.bottom - signatureRect.bottom + signatureElement.offsetTop - signatureRect.height +100;
-      
-      var finalX = Math.min(Math.max(minX, event.clientX - offset.x - containerRect.left), maxX);
-      var finalY = Math.min(Math.max(minY, event.clientY - offset.y - containerRect.top), maxY);
-      
-      signatureElement.style.left = finalX + 'px';
-      signatureElement.style.top = finalY + 'px';
-  
-      if (dragging) {
+      // Varsa varsayılan davranışı engelle
+      if (e.cancelable) {
         e.preventDefault();
       }
-  
     }
   
     function stopDrag(e) {
+      if (dragging && e.cancelable) {
+        e.preventDefault();
+      }
       dragging = false;
     }
   
-    signatureElement.addEventListener('mousedown', startDrag, false, { passive: false });
-    signatureElement.addEventListener('touchstart', startDrag, false, { passive: false });
-  
-    window.addEventListener('mousemove', doDrag, false, { passive: false });
-    window.addEventListener('touchmove', doDrag, false, { passive: false });
-  
-    window.addEventListener('mouseup', stopDrag, false, { passive: false });
-    window.addEventListener('touchend', stopDrag, false, { passive: false });
-  
+    // Dokunmatik ve fare olayları için dinleyicileri ekleyin
+    signatureElement.addEventListener('mousedown', startDrag, false);
+    signatureElement.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('mousemove', doDrag, false);
+    window.addEventListener('touchmove', doDrag, { passive: false });
+    window.addEventListener('mouseup', stopDrag, false);
+    window.addEventListener('touchend', stopDrag, { passive: false });
   }
+  
   
   
   function makeRotatable(signatureElement, rotateHandle) {
