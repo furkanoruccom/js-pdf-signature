@@ -229,4 +229,3 @@ function createSignatureElement(src, x, y) {
 
 
 
-

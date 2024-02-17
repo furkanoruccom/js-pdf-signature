@@ -21,9 +21,9 @@
         <input type="file" id="pdfFile" accept="application/pdf" class="form-control" style="margin: 20px;" />
 
         <div class="signaturebtns">
-            <button id="placeSignature" class="btn btn-dark text-white" type="button">İmzayı
-                Yerleştir <i class="fa-solid fa-file-signature ms-2"></i></button>
-            <button id="download_btn" class="btn btn-dark d-none" type="button">PDF İndir</button>
+            <button id="placeSignature" class="btn btn-dark text-white" type="button"><i class="fa-solid fa-file-signature"></i></button>
+            <button id="placeSeal" class="btn btn-primary text-white" type="button"><i class="fa-solid fa-file-signature"></i></button>
+            <button id="download_btn" class="btn btn-dark" type="button">PDF İndir</button>
         </div>
 
         <button type="button" class="btn-close-signature" id="modalSignatureClose">
@@ -59,7 +59,13 @@
 
 
 
-
+    <script src="https://unpkg.com/konva@9.3.3/konva.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
+    
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>

@@ -1,69 +1,77 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Sınırlı Sürükleme ile Div İçinde Sürükleme</title>
+  <head>
+    <script src="https://unpkg.com/konva@9.3.3/konva.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
+    <meta charset="utf-8" />
+    <title>Konva PDF Demo</title>
     <style>
-        #container {
-            width: 400px;
-            height: 400px;
-            position: relative;
-            background-color: #f0f0f0;
-            overflow: hidden;
-        }
-        #draggable {
-            width: 50px;
-            height: 50px;
-            background-color: red;
-            position: absolute;
-            cursor: pointer;
-        }
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #f0f0f0;
+      }
+      #save {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
 
-<div id="container">
-    <div id="draggable"></div>
-</div>
+  <body>
+    <div id="container"></div>
+    <button id="save">Save as PDF</button>
+    <script>
+      var width = window.innerWidth;
+      var height = window.innerHeight;
 
-<script>
-    var container = document.getElementById('container'),
-        draggable = document.getElementById('draggable'),
-        isDragging = false,
-        offsetX = 0,
-        offsetY = 0;
+      var stage = new Konva.Stage({
+        container: 'container',
+        width: width,
+        height: height,
+      });
 
-    draggable.addEventListener('mousedown', function(e) {
-        isDragging = true;
-        offsetX = e.clientX - draggable.getBoundingClientRect().left;
-        offsetY = e.clientY - draggable.getBoundingClientRect().top;
-        container.style.cursor = 'move';
-    });
+      var layer = new Konva.Layer();
+      stage.add(layer);
 
-    container.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-            var moveX = e.clientX - offsetX;
-            var moveY = e.clientY - offsetY;
+      var back = new Konva.Rect({
+        width: stage.width(),
+        height: stage.height(),
+      });
+      layer.add(back);
 
-            // Sınırları hesapla
-            var rightLimit = container.offsetWidth - draggable.offsetWidth;
-            var bottomLimit = container.offsetHeight - draggable.offsetHeight;
 
-            // Sınırlar içinde kalmasını sağla
-            moveX = Math.min(Math.max(0, moveX), rightLimit);
-            moveY = Math.min(Math.max(0, moveY), bottomLimit);
 
-            draggable.style.left = moveX + 'px';
-            draggable.style.top = moveY + 'px';
-        }
-    });
+      document.getElementById('save').addEventListener('click', function () {
+        var pdf = new jsPDF('l', 'px', [stage.width(), stage.height()]);
+        pdf.setTextColor('#000000');
+        // first add texts
+        stage.find('Text').forEach((text) => {
+          const size = text.fontSize() / 0.75; // convert pixels to points
+          pdf.setFontSize(size);
+          pdf.text(text.text(), text.x(), text.y(), {
+            baseline: 'top',
+            angle: -text.getAbsoluteRotation(),
+          });
+        });
 
-    document.addEventListener('mouseup', function() {
-        if (isDragging) {
-            isDragging = false;
-            container.style.cursor = 'default';
-        }
-    });
-</script>
+        // then put image on top of texts (so texts are not visible)
+        pdf.addImage(
+          stage.toDataURL({ pixelRatio: 2 }),
+          0,
+          0,
+          stage.width(),
+          stage.height()
+        );
 
-</body>
+        pdf.save('canvas.pdf');
+      });
+    </script>
+  </body>
 </html>

@@ -115,7 +115,10 @@ function addDraggableToSignature(signatureElement) {
   
     var x = parseInt(selectionArea.style.left, 10);
     var y = parseInt(selectionArea.style.top, 10);
+
     var signatureElement = createSignatureElement(getRandomSignature(), x, y)
+
+
     $(".selectionArea").css({ "left": "0" });
   
     $("#pdfCanvasContainer").append(signatureElement);
@@ -157,4 +160,7 @@ function addDraggableToSignature(signatureElement) {
     addDraggableToSignature(signatureElement);
   
   });
+
+
+
   
