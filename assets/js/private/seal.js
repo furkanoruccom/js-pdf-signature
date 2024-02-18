@@ -36,6 +36,8 @@ function createSealElement(src, x, y) {
       wrapper.remove();
     });
 
+    
+
   
     return wrapper;
   }
