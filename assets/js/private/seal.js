@@ -1,9 +1,9 @@
 var seals = [
-  'assets/seals/muhur-1.png',
-  'assets/seals/muhur-2.png',
-  'assets/seals/muhur-3.png',
-  'assets/seals/muhur-4.png',
-  'assets/seals/muhur-5.png'
+  'assets/seals/seal-1.png',
+  'assets/seals/seal-2.png',
+  'assets/seals/seal-3.png',
+  'assets/seals/seal-4.png',
+  'assets/seals/seal-5.png'
 ];
 
 function getRandomSeal() {
@@ -41,11 +41,10 @@ function createSealElement(src, x, y) {
   }
   
 
-  document.getElementById('placeSeal').addEventListener('click', function () {
+  $("#placeSeal").click(function (e) { 
     var x = parseInt(selectionArea.style.left, 10);
     var y = parseInt(selectionArea.style.top, 10);
     var sealElement = createSealElement(getRandomSeal(), x, y);
     $("#pdfCanvasContainer").append(sealElement);
     addDraggableToSignature(sealElement);
-
   });

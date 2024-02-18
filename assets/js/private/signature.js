@@ -117,11 +117,11 @@ function addDraggableToSignature(signatureElement) {
 
 
   var signatures = [
-    'assets/signatures/imza-1.png',
-    'assets/signatures/imza-2.png',
-    'assets/signatures/imza-3.png',
-    'assets/signatures/imza-4.png',
-    'assets/signatures/imza-5.png'
+    'assets/signatures/signature-1.png',
+    'assets/signatures/signature-2.png',
+    'assets/signatures/signature-3.png',
+    'assets/signatures/signature-4.png',
+    'assets/signatures/signature-5.png'
   ];
   
   function getRandomSignature() {
@@ -130,8 +130,7 @@ function addDraggableToSignature(signatureElement) {
   }
 
 
-  // İmza yerleştirme fonksiyonunu değiştirelim
-  document.getElementById('placeSignature').addEventListener('click', function () {
+  $("#placeSignature").click(function (e) { 
   
     var x = parseInt(selectionArea.style.left, 10);
     var y = parseInt(selectionArea.style.top, 10);
