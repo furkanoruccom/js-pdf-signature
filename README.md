@@ -1,6 +1,6 @@
 ## Live Demo
 
-[Live Demo](https://furkanoruccom.github.io/js-pdf-signature/)
+[Live Demo](https://furkanoruccom.github.io/js-pdf-signature/) : powered by [Furkan Oruç](https://furkanoruccom.github.io/js-pdf-signature/)
 
 The JS PDF Signature project provides a comprehensive web application designed to enhance PDF documents by allowing users to easily place digital signatures and stamps directly onto their pages. Built with a mix of modern web technologies and libraries, this tool caters to a wide range of users, from professionals seeking to sign official documents to individuals aiming to add a personal touch to their PDF files.
 
