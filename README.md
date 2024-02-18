@@ -2,16 +2,6 @@
 
 [Live Demo](https://furkanoruccom.github.io/js-pdf-signature/)
 
-## Kurulum
-
-Projeyi yerel olarak kurmak için aşağıdaki adımları izleyin:
-
-```bash
-git clone https://github.com/yourgithubusername/js-pdf-signature.git
-cd js-pdf-signature
-# Özel kurulum talimatları için burayı takip edin
-# JS PDF Signature
-
 The JS PDF Signature project provides a comprehensive web application designed to enhance PDF documents by allowing users to easily place digital signatures and stamps directly onto their pages. Built with a mix of modern web technologies and libraries, this tool caters to a wide range of users, from professionals seeking to sign official documents to individuals aiming to add a personal touch to their PDF files.
 
 ## Features and Technologies
@@ -65,6 +55,14 @@ Bir PDF belgesi yüklendiğinde, uygulama içeriğiyle etkileşimde bulunabilece
 ## Sonuç
 
 Bu web uygulaması, dijital belge imzalama ve damgalama için pratik ve erişilebilir bir çözüm olarak öne çıkar. Modern web teknolojilerinin gücünü kapsayarak, PDF belgelerini kişiselleştirmek için esnek ve kullanıcı dostu bir platform sunar. İster iş sözleşmeleri, resmi belgeler veya kişisel kullanım için olsun, bu araç, dijital imzaları ve damgaları eklemenin sürecini basitleştirir, kağıt tabanlı işlemlerin ihtiyacını ortadan kaldırır ve dijital çağda iş akışı verimliliğini artırır.
+
+
+
+```bash
+git clone https://github.com/furkanoruccom/js-pdf-signature.git
+cd js-pdf-signature
+# Özel kurulum talimatları için burayı takip edin
+# JS PDF Signature
 
 
 
