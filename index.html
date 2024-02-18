@@ -7,46 +7,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="UTF-8">
 
-    <title>PDF Üzerine İmza Yerleştirme</title>
+    <title>Placing signature and stamp on PDF</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/flick/jquery-ui.css">
-    <link rel="stylesheet" href="fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
+    <p style="position: absolute; bottom: 10px; left:10px;"> powered by <a href="https://furkanoruc.com/"
+            target="_blank">Furkan Oruç</a></p>
+
     <div class="container">
-        <input type="file" id="pdfFile" accept="application/pdf" class="form-control" style="margin: 20px;" />
-
-        <div class="signaturebtns">
-            <button id="placeSignature" class="btn btn-dark text-white" type="button"><i class="fa-solid fa-file-signature"></i></button>
-            <button id="placeSeal" class="btn btn-primary text-white" type="button"><i class="fa-solid fa-file-signature"></i></button>
-            <button id="download_btn" class="btn btn-dark" type="button">PDF İndir</button>
+        <div class="row my-4">
+            <div class="col-9">
+                <input type="file" id="pdfFile" accept="application/pdf" class="form-control " />
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary w-100" id="btnmodalSignature" data-bs-toggle="modal"
+                    data-bs-target="#modalSignature">
+                    Open PDF
+                </button>
+            </div>
         </div>
+    </div>
+    
+    <!-- start: close button -->
+    <button type="button" class="btn-close-signature" id="modalSignatureClose">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    <!-- end: close button -->
 
-        <button type="button" class="btn-close-signature" id="modalSignatureClose">
-            <i class="fa-solid fa-xmark"></i>
+    <!-- start: signature and seal buttons -->
+    <div class="signaturebtns">
+        <button id="placeSignature" class="btn btn-warning text-white mb-2" type="button" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Place signature">
+            <i class="fa-solid fa-file-signature"></i>
         </button>
-
-
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" id="btnmodalSignature" data-bs-toggle="modal"
-            data-bs-target="#modalSignature">
-            PDF
+        <button id="placeSeal" class="btn btn-primary text-white d-block mb-2" type="button" data-bs-toggle="tooltip"
+            data-bs-placement="top" title="Place seal">
+            <i class="fa-duotone fa-stamp"></i>
+        </button>
+        <button id="download_btn" class="btn btn-danger" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Download document">
+            <i class="fa-solid fa-download"></i>
         </button>
     </div>
+    <!-- end: signature and seal buttons -->
 
     <!-- Modal -->
     <div class="modal fade" id="modalSignature" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+
+
+
         <div class="modal-dialog  modal-xl">
             <div class="modal-content" style="min-width: 1070px; max-width: 1070px; width: 1070px; ">
                 <div class="modal-body bg-dark p-0">
-                    
+
+
+
+
+
+
+                    <!-- start: pdf canvas container -->
                     <div id="pdfCanvasContainer" style="width: 1070px; position: relative;">
                         <div class="selectionArea" id="selectionArea"></div>
                     </div>
+                    <!-- end: pdf canvas container -->
 
                 </div>
             </div>
@@ -55,53 +83,24 @@
 
 
 
+    <script src="assets/js/bootstrap.min.js"></script>
 
+    <script src="assets/js/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/jquery-ui.min.js"></script>
+    <script src="assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="assets/js/jquery.ui.rotatable.min.js"></script>
 
+    <script src="assets/js/build/pdf.min.js"></script>
 
+    <script src="assets/js/private/pdf-main.js"></script>
+    <script src="assets/js/private/pdf-custom.js"></script>
 
+    <script src="assets/js/private/signature.js"></script>
+    <script src="assets/js/private/seal.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-    <script src="https://www.jqueryscript.net/demo/CSS3-Rotatable-jQuery-UI/jquery.ui.rotatable.js"></script>
-<script src="jspdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
-    <script src="html2canvas.min.js"></script>
-
-    <script src="signature-add.js"></script>
-    <script src="signature.js"></script>
-    <script src="seal.js"></script>
-    
-    <script src="download.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            
-            // Modal açıldığında çalışacak fonksiyon
-            $('#modalSignature').on('show.bs.modal', function () {
-                // 'content' değerini al ve 'initial-scale=1' içeriyorsa 'initial-scale=0' ile değiştir
-                var content = $('meta[name="viewport"]').attr('content');
-                var newContent = content.replace('initial-scale=1', 'initial-scale=0');
-                $('meta[name="viewport"]').attr('content', newContent);
-            });
-
-            // Modal kapandığında çalışacak fonksiyon
-            $('#modalSignature').on('hidden.bs.modal', function () {
-                // 'content' değerini al ve 'initial-scale=0' içeriyorsa 'initial-scale=1' ile değiştir
-                var content = $('meta[name="viewport"]').attr('content');
-                var newContent = content.replace('initial-scale=0', 'initial-scale=1');
-                $('meta[name="viewport"]').attr('content', newContent);
-            });
-        });
-    </script>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-        crossorigin="anonymous"></script>
+    <script src="assets/js/jspdf.min.js"></script>
+    <script src="assets/js/html2canvas.min.js"></script>
+    <script src="assets/js/private/download.js"></script>
 </body>
 
 </html>
