@@ -1,9 +1,9 @@
 var seals = [
-  '/assets/seals/muhur-1.png',
-  '/assets/seals/muhur-2.png',
-  '/assets/seals/muhur-3.png',
-  '/assets/seals/muhur-4.png',
-  '/assets/seals/muhur-5.png'
+  'assets/seals/muhur-1.png',
+  'assets/seals/muhur-2.png',
+  'assets/seals/muhur-3.png',
+  'assets/seals/muhur-4.png',
+  'assets/seals/muhur-5.png'
 ];
 
 function getRandomSeal() {
