@@ -61,7 +61,7 @@ Bu web uygulaması, dijital belge imzalama ve damgalama için pratik ve erişile
 ```bash
 git clone https://github.com/furkanoruccom/js-pdf-signature.git
 cd js-pdf-signature
-# Özel kurulum talimatları için burayı takip edin
+# Özel kurulum talimatları için burayı takip edin - Follow here for specific installation instructions
 # JS PDF Signature
 
 
