@@ -8,19 +8,16 @@ $("#modalSignature").scroll(function () {
 });
 
 
-$(".btn-close-signature").hide();
-$(".signaturebtns").hide();
+$(".btn-close-signature, ..signaturebtns").hide();
 
 
 $("#modalSignature").on('shown.bs.modal', function () {
-  $(".btn-close-signature").toggle();
-  $(".signaturebtns").toggle();
+  $(".btn-close-signature, .signaturebtns").toggle();
 
 });
 
 $(".btn-close-signature").click(function () {
-  $(".btn-close-signature").toggle();
-  $(".signaturebtns").toggle();
+  $(".btn-close-signature, .signaturebtns").toggle();
   $("#modalSignature").modal('hide');
 });
 
