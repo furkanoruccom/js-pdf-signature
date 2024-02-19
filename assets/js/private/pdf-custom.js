@@ -1,8 +1,7 @@
-$("#btnmodalSignature").hide();
 $("#modalSignature").scroll(function () {
   $(".selectionArea").css({ "top": startPosition + $(this).scrollTop() + "px", "position": "absolute" });
 });
-$(".btn-close-signature, .signaturebtns").hide();
+
 $("#modalSignature").on('shown.bs.modal', function () {
   $(".btn-close-signature, .signaturebtns").toggle();
 });
